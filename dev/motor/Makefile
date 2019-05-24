@@ -1,6 +1,6 @@
 obj-m += motor_drv.o
-KERNELDIR:=/home/pierce/6818GEC/kernel
-CROSS_COMPILE:=/home/pierce/6818GEC/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin/arm-eabi-
+KERNELDIR:=/home/haidee/6818GEC/kernel
+CROSS_COMPILE:=/home/haidee/6818GEC/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin/arm-eabi-
 
 PWD:=$(shell pwd)
 

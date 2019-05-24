@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>远程视频监控系统</title>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/login.css"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	</head>
+	
+	<body>
+	<div class="box">
+		<div class="login-box">
+			<div class="login-title text-center">
+				<h1>
+					<small>远程视频监控系统</small>
+				</h1>
+			</div>
+			<div class="login-content ">
+				<div class="form">
+					<form id="modifyPassword" class="form-horizontal"  action="../cgi-bin/center_r.cgi" method="get">							
+						<!-- 用户名输入 -->
+						<div class="form-group">
+							<div class="col-xs-10 col-xs-offset-1">
+								<div class="input-group">
+									<span class="input-group-addon"><span
+										class="glyphicon glyphicon-user"></span></span> 
+								<input type="text" id="username" name="username" class="form-control" placeholder="用户名">
+								</div>
+							</div>
+						</div>
+						
+						<!-- 密码输入 -->
+						<div class="form-group">
+							<div class="col-xs-10 col-xs-offset-1">
+								<div class="input-group">
+									<span class="input-group-addon"><span
+										class="glyphicon glyphicon-lock"></span></span> 
+										<input type="password" id="password" name="password" class="form-control" placeholder="密码">
+								</div>
+							</div>
+						</div>
+						
+								
+						<!-- 登录重置按钮 -->
+						<div class="form-group form-actions">
+							<div class="col-xs-12 text-center">
+								<button type="submit" id="login" class="btn btn-sm btn-success" >
+									<span class="fa fa-check-circle"></span>登录
+								</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

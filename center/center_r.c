@@ -1,8 +1,8 @@
 /*************************************************************************
  * @Author                :  haidee
- * @Date                  :  2019-05-21T01:00:56+08:00
+ * @Date                  :  2019-05-22T11:14:23+08:00
  * @Last modified by      :  haidee
- * @Last modified time    :  2019-05-22T11:35:17+08:00
+ * @Last modified time    :  2019-05-22T11:47:42+08:00
  ************************************************************************/
 
 
@@ -106,12 +106,12 @@ int cgiMain() {
 
 	while(row = mysql_fetch_row(res)) {
 		i++;
-		fprintf(cgiOut,"\t\t\t<td><form action=\"http://");
-		fprintf(cgiOut,row[1]);
-		fprintf(cgiOut,"/cgi-bin/monitor.cgi\" mothod=\"GET\" align=\"center\">\n");
-		fprintf(cgiOut,"\t\t\t\t<input name=\"image\" type=\"image\" src=\"http://");
-		fprintf(cgiOut,row[1]);
-		fprintf(cgiOut,":8080/?action=stream\" width=\"640\" height=\"480\"></img>\n");
+		fprintf(cgiOut,"\t\t\t<td><form action=\"../server");
+		fprintf(cgiOut,"%d",i);
+		fprintf(cgiOut,"/cgi-bin/monitor_r.cgi\" mothod=\"GET\" align=\"center\">\n");
+		fprintf(cgiOut,"\t\t\t\t<input name=\"image\" type=\"image\" src=\"../server");
+		fprintf(cgiOut,"%d",i);
+		fprintf(cgiOut,"_mjpg/?action=stream\" width=\"640\" height=\"480\"></img>\n");
 		fprintf(cgiOut,"\t\t\t\t<br><h3>machine IP:");
 		fprintf(cgiOut,row[1]);
 		fprintf(cgiOut,"</h3>\n");

@@ -1,5 +1,14 @@
+/*************************************************************************
+ * @Author                :  haidee
+ * @Date                  :  2019-05-07T15:33:13+08:00
+ * @Last modified by      :  haidee
+ * @Last modified time    :  2019-05-22T20:32:56+08:00
+ ************************************************************************/
+
+
+
 #include <linux/kernel.h>
-#include <linux/module.h> 
+#include <linux/module.h>
 #include <linux/cdev.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
@@ -18,7 +27,7 @@ UARTTXD2----GPIOD20 ----- PAD_GPIO_D + 20
 
 struct gpio_info{
 	unsigned int gpio_num;
-	char gpio_name[20];	
+	char gpio_name[20];
 };
 
 static struct gpio_info gec6818_motor_info[2] = {
@@ -29,7 +38,7 @@ static struct gpio_info gec6818_motor_info[2] = {
 	{
 		.gpio_num = PAD_GPIO_D + 20,
 		.gpio_name = "motor2_sig"
-	},	
+	},
 };
 
 
@@ -57,11 +66,12 @@ static ssize_t gec6818_motor_write(struct file *filp, const char __user *buf, si
 	char kbuf[2];
 	int ret;
 	unsigned int duty = 0;
+	int i = 0;
 
 	ret = copy_from_user(kbuf, buf, len);
 	if(ret != 0){
 		printk("copy from user error\n");
-		return -EFAULT;	
+		return -EFAULT;
 	}
 
 	if(kbuf[1] == 1) {
@@ -74,16 +84,18 @@ static ssize_t gec6818_motor_write(struct file *filp, const char __user *buf, si
 			motor_status[(unsigned int)kbuf[0]] -= 10;
 	} else {
 		duty = 1000;
-	}	
-	gpio_direction_output(gec6818_motor_info[(unsigned int)kbuf[0]].gpio_num, 0);
+	}
+	
+	gpio_direction_output(gec6818_motor_info[(unsigned int)kbuf[0]].gpio_num, 1);
 	if(duty > 1000) {
 		mdelay(1);
 		udelay(duty - 500);
 	} else {
 		udelay(500 + duty);
 	}
-	gpio_direction_output(gec6818_motor_info[(unsigned int)kbuf[0]].gpio_num, 1);
-
+	gpio_direction_output(gec6818_motor_info[(unsigned int)kbuf[0]].gpio_num, 0);
+	mdelay(20);
+	
 	return len;
 }
 
@@ -99,7 +111,7 @@ static const struct file_operations gec6818_motor_fops = {
 	.release = gec6818_motor_release,
 };
 
- 
+
 //module的入口函数---驱动的初始化安装函数
 static int __init gec6818_motor_init(void)
 {
@@ -115,10 +127,10 @@ static int __init gec6818_motor_init(void)
 		printk("can not get device number\n");
 		return ret;
 	}
-	
+
 	//4.初始化cdev
 	cdev_init(&gec6818_motor_cdev, &gec6818_motor_fops);
-	
+
 	//5、将cdev加入内核
 	ret = cdev_add(&gec6818_motor_cdev, motor_dev_num, 1);
 	if(ret < 0){
@@ -132,7 +144,7 @@ static int __init gec6818_motor_init(void)
 		ret = -EBUSY;
 		goto class_create_error;
 	}
-	
+
 	//7.创建device
 	motor_device = device_create(motor_class, NULL,
 			     motor_dev_num, NULL, "motor_drv");
@@ -141,45 +153,43 @@ static int __init gec6818_motor_init(void)
 		ret = -EBUSY;
 		goto device_create_error;
 	}
-	
+
 	//8.申请GPIO口
 	for(i=0;i<2;i++)
 		gpio_free(gec6818_motor_info[i].gpio_num);
-	
+
 	for(i=0;i<2;i++){
-		ret = gpio_request(gec6818_motor_info[i].gpio_num, 
+		ret = gpio_request(gec6818_motor_info[i].gpio_num,
 					gec6818_motor_info[i].gpio_name);
 		if(ret < 0){
 			printk("can not request gpio:%s\n", gec6818_motor_info[i].gpio_name);
-			goto gpio_request_error;			
-		}	
+			goto gpio_request_error;
+		}
 		gpio_direction_output(gec6818_motor_info[i].gpio_num, 0);
 	}
-	mdelay(2000);
 
-	/*gpio_direction_output(gec6818_motor_info[0].gpio_num, 1);
+	gpio_direction_output(gec6818_motor_info[0].gpio_num, 1);
 	gpio_direction_output(gec6818_motor_info[1].gpio_num, 1);
 
-	mdelay(2000);
-	
+	udelay(1500);
+
 	gpio_direction_output(gec6818_motor_info[0].gpio_num, 0);
 	gpio_direction_output(gec6818_motor_info[1].gpio_num, 0);
-	
-	udelay(1000);
+
 	mdelay(18);
-	
+
 	motor_status[0] = 90;
-	motor_status[1] = 90;*/
+	motor_status[1] = 90;
 
 	printk("gec6818 motor driver init\n");
-	
+
 	return 0;
 
 gpio_request_error:
 	while(i--)//--i
 		gpio_free(gec6818_motor_info[i].gpio_num);
-	device_destroy(motor_class, motor_dev_num);	
-	
+	device_destroy(motor_class, motor_dev_num);
+
 device_create_error:
 	class_destroy(motor_class);
 class_create_error:
@@ -199,14 +209,14 @@ static void __exit gec6818_motor_exit(void)
 	class_destroy(motor_class);
 	for(i=0;i<2;i++)
 		gpio_free(gec6818_motor_info[i].gpio_num);
-	
+
 	printk("gec6818 motor driver exit\n");
 }
- 
+
 //module的入口和出口
 module_init(gec6818_motor_init);
-module_exit(gec6818_motor_exit); 
- 
+module_exit(gec6818_motor_exit);
+
 //module的描述
 MODULE_AUTHOR("1003261954@qq.com");
 MODULE_DESCRIPTION("GEC6818 MOTOR Device Driver");
